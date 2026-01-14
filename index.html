@@ -1,1 +1,37 @@
-<h1>334</h1>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>金壬指數評分入口</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+    #summary { font-size: 1.2em; margin: 20px; color: #c39953; }
+    button { padding: 15px 30px; font-size: 1.2em; background: #c39953; color: white; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>金壬指數評分</h1>
+  <p class="intro">綜合評估股票投資價值的自訂指標，分數越高投資吸引力越強。</p>
+  
+  <div id="daily-summary">載入中...</div>
+  
+  <button onclick="window.open('您的 Apps Script 完整網址/exec', '_blank')">立即查看完整評分表格</button>
+
+  <script>
+    const csvUrl = '您的公開 CSV 連結（例如 https://docs.google.com/spreadsheets/d/[ID]/pub?output=csv&gid=0)';
+
+    fetch(csvUrl)
+      .then(response => response.text())
+      .then(csvText => {
+        const rows = csvText.split('\n').map(row => row.split(','));
+        // 假設 B3 是分數最高的一行（或您自行解析）
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('daily-summary').innerHTML = 
+          `最新更新：${today}<br>今日最高分股票：${rows[3][0] || '載入中'}（分數：${rows[3][1] || 'N/A'}）`;
+      })
+      .catch(error => {
+        document.getElementById('daily-summary').innerHTML = '資料載入失敗，請稍後再試。';
+      });
+  </script>
+</body>
+</html>

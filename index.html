@@ -6,11 +6,11 @@
   <meta name="description" content="金壬指數 - 綜合評估股票投資價值，自訂玄學風水指標，分數越高投資吸引力越強。每日更新，提供另一視角助投資決策。">
   <meta name="keywords" content="金壬指數,股票評分,風水投資,玄學股票,金水師傅">
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; background-color: #f8f9fa; color: #333; margin: 0; }
+    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; background-color: #f8f9fa; color: #333; }
     h1 { color: #c39953; }
     .intro { font-size: 1.1em; max-width: 700px; margin: 20px auto; line-height: 1.6; }
     #daily-summary { font-size: 1.2em; margin: 30px; color: #c39953; font-weight: bold; min-height: 100px; }
-    table { width: 100%; max-width: 960px; margin: 0 auto; border-collapse: collapse; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-radius: 8px; overflow: hidden; }
+    table { width: 100%; max-width: 960px; margin: 30px auto; border-collapse: collapse; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-radius: 8px; overflow: hidden; }
     th, td { padding: 16px; text-align: center; border-bottom: 1px solid #e0e0e0; }
     th { background-color: #c39953; color: white; cursor: pointer; }
     .loading { color: #666; }
@@ -23,8 +23,8 @@
   
   <div id="daily-summary" class="loading">載入每日摘要中...</div>
   
-  <div id="table-container" style="display:none;">
-    <h2>完整評分表格（每日更新）</h2>
+  <div id="table-container">
+    <h2>完整評分表格</h2>
     <table id="sortableTable">
       <thead id="tableHead"></thead>
       <tbody id="tableBody"></tbody>
@@ -32,8 +32,7 @@
   </div>
 
   <script>
-    // 你的 JSON 端點（加 ?mode=json）
-    const jsonUrl = 'https://script.google.com/macros/s/AKfycbworTqDWlMhPmQh0iO-M2P9qck_F-JcooURftsvMDJZArmhAH7fS56jdxZjCORfRjGO6A/exec?mode=json';
+    const jsonUrl = 'https://script.google.com/macros/s/你的ID/exec';  // ← 換成你現在成功的 JSON 端點（如果需要加 ?mode=json 就加）
 
     fetch(jsonUrl)
       .then(response => {
@@ -44,7 +43,7 @@
         // 顯示摘要
         document.getElementById('daily-summary').innerHTML = 
           `最新更新：${data.date}<br>` +
-          `<small>${data.message}</small>`;
+          `<small>${data.message || '金壬指數完整評分'}</small>`;
 
         // 產生表格
         const head = document.getElementById('tableHead');
@@ -69,13 +68,10 @@
           });
           body.appendChild(tr);
         });
-
-        // 顯示表格
-        document.getElementById('table-container').style.display = 'block';
       })
       .catch(error => {
         document.getElementById('daily-summary').innerHTML = 
-          '載入失敗<br>錯誤：' + error.message;
+          '載入失敗<br>錯誤：' + error.message + '<br>請檢查 console (F12)';
       });
   </script>
 </body>

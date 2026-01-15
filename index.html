@@ -10,10 +10,7 @@
     h1 { color: #c39953; }
     .intro { font-size: 1.1em; max-width: 700px; margin: 20px auto; line-height: 1.6; }
     #daily-summary { font-size: 1.2em; margin: 30px; color: #c39953; font-weight: bold; min-height: 100px; }
-    table { width: 100%; max-width: 960px; margin: 30px auto; border-collapse: collapse; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-radius: 8px; overflow: hidden; }
-    th, td { padding: 16px; text-align: center; border-bottom: 1px solid #e0e0e0; }
-    th { background-color: #c39953; color: white; cursor: pointer; }
-    .loading { color: #666; }
+    .error { color: red; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -21,57 +18,40 @@
   
   <p class="intro">綜合評估股票投資價值的自訂指標，融合五行、陰陽、易經與風水智慧。<br>分數越高，投資吸引力越強。每日更新，提供獨特視角助您決策。</p>
   
-  <div id="daily-summary" class="loading">載入每日摘要中...</div>
+  <div id="daily-summary">載入每日摘要中...</div>
   
-  <div id="table-container">
-    <h2>完整評分表格</h2>
-    <table id="sortableTable">
-      <thead id="tableHead"></thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-  </div>
+  <button onclick="window.open('https://script.google.com/macros/s/AKfycbyyWr5raaBRSXJPQcdn4tM7MsdtRsvLxeDr2JPklgehnNqouu91R_CfKowcoluEM54D/exec', '_blank')">
+    立即查看完整評分表格（僅限本人）
+  </button>
 
   <script>
-    const jsonUrl = 'https://script.google.com/macros/s/你的ID/exec';  // ← 換成你現在成功的 JSON 端點（如果需要加 ?mode=json 就加）
+    // 用你測試成功的 JSON 端點（確認這個網址正確無誤）
+    const jsonUrl = 'https://script.google.com/macros/s/AKfycbxrOO7MIdL3UWN0HYN-2okkzc8p3vHjpRp8zpCVPQnP9lp17DpZFF7Ye4G7mXy_ItGEuA/exec';
+
+    console.log('嘗試從這個網址拉取 JSON：', jsonUrl);
 
     fetch(jsonUrl)
       .then(response => {
-        if (!response.ok) throw new Error('連線失敗 ' + response.status);
+        console.log('伺服器回應狀態：', response.status);
+        if (!response.ok) {
+          throw new Error('伺服器回應不正常，狀態碼：' + response.status);
+        }
         return response.json();
       })
       .then(data => {
-        // 顯示摘要
+        console.log('成功收到資料：', data);
         document.getElementById('daily-summary').innerHTML = 
           `最新更新：${data.date}<br>` +
-          `<small>${data.message || '金壬指數完整評分'}</small>`;
-
-        // 產生表格
-        const head = document.getElementById('tableHead');
-        const body = document.getElementById('tableBody');
-
-        // 標頭
-        const headerRow = document.createElement('tr');
-        data.headers.forEach(h => {
-          const th = document.createElement('th');
-          th.textContent = h;
-          headerRow.appendChild(th);
-        });
-        head.appendChild(headerRow);
-
-        // 資料行
-        data.rows.forEach(row => {
-          const tr = document.createElement('tr');
-          row.forEach(cell => {
-            const td = document.createElement('td');
-            td.textContent = cell || '';
-            tr.appendChild(td);
-          });
-          body.appendChild(tr);
-        });
+          `今日最高分：${data.topStock || '無資料'}<br>` +
+          `分數：${data.topScore || 'N/A'} 分<br>` +
+          `<small>${data.message || '金壬指數每日摘要'} (${data.debug || ''})</small>`;
       })
       .catch(error => {
+        console.error('Fetch 失敗詳細錯誤：', error);
         document.getElementById('daily-summary').innerHTML = 
-          '載入失敗<br>錯誤：' + error.message + '<br>請檢查 console (F12)';
+          '<span class="error">每日摘要載入失敗</span><br>' +
+          '錯誤：' + error.message + '<br>' +
+          '請按 F12 開啟 console 查看詳細錯誤，並告訴我內容';
       });
   </script>
 </body>

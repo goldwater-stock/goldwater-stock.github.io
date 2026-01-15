@@ -15,7 +15,13 @@
     }
     h1 { color: #c39953; }
     .intro { font-size: 1.1em; max-width: 700px; margin: 20px auto; line-height: 1.6; }
-    #daily-summary { font-size: 1.2em; margin: 30px; color: #c39953; font-weight: bold; }
+    #daily-summary { 
+      font-size: 1.2em; 
+      margin: 30px; 
+      color: #c39953; 
+      font-weight: bold; 
+      min-height: 80px; /* 避免載入時跳動 */
+    }
     button { 
       padding: 15px 40px; 
       font-size: 1.3em; 
@@ -33,27 +39,33 @@
   
   <p class="intro">綜合評估股票投資價值的自訂指標，融合五行、陰陽、易經與風水智慧。<br>分數越高，投資吸引力越強。每日更新，提供獨特視角助您決策。</p>
   
-  <div id="daily-summary">每日最高分摘要（開發中，測試階段暫不顯示）</div>
+  <div id="daily-summary">載入每日最高分中...</div>
   
   <button onclick="window.open('https://script.google.com/macros/s/AKfycbyfSiqyjxbz0IUjhOoH86cGflTEGKemcQSawWb-cSrI1NgaC7dYTpON2_Mmtixpdodzzw/exec', '_blank')">
     立即查看完整評分表格（僅限本人）
   </button>
 
-  <!-- 之後要開啟每日摘要時，再把下面這段打開 -->
-  <!--
   <script>
-    const jsonUrl = 'https://script.google.com/macros/s/你的公開JSON端點ID/exec';  // 之後換成公開的 JSON 網址
+    // ←←← 這裡換成你新部署的 JSON 端點網址！！
+    const jsonUrl = 'https://script.google.com/macros/s/你的新JSON部署ID/exec';
 
     fetch(jsonUrl)
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) throw new Error('網路回應不正常');
+        return response.json();
+      })
       .then(data => {
         document.getElementById('daily-summary').innerHTML = 
-          `最新更新：${data.date}<br>今日最高分：${data.topStock}（${data.topScore}分）`;
+          `最新更新：${data.date}<br>` +
+          `今日最高分：${data.topStock}<br>` +
+          `分數：${data.topScore} 分<br>` +
+          `<small>${data.message || '金壬指數每日最高分'}</small>`;
       })
-      .catch(() => {
-        document.getElementById('daily-summary').innerHTML = '每日摘要載入中...';
+      .catch(error => {
+        console.error('Fetch 錯誤:', error); // 方便你檢查
+        document.getElementById('daily-summary').innerHTML = 
+          '每日摘要暫時無法載入（可能網路問題或端點未公開）<br>請稍後再試～';
       });
   </script>
-  -->
 </body>
 </html>

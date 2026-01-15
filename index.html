@@ -2,10 +2,8 @@
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8">
-  <title>金壬指數評分</title>
-
-  <meta name="description"
-    content="金壬指數為綜合評估股票投資價值的自訂指標，融合多角度分析，分數越高代表投資吸引力越強。每日自動更新，僅公開最終評級結果。">
+  <title>金水股票評分</title>
+  <meta name="description" content="金水股票評分系統，每日自動更新，僅公開最終評級結果。">
 
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -13,35 +11,33 @@
 <body>
   <div class="container">
 
-    <h1>金壬指數評分</h1>
+    <h1>金水股票評分</h1>
 
-    <p class="intro">
-      金壬指數為一套綜合評估股票投資價值的自訂評分系統，
-      結合多項市場數據與內部模型分析，僅公開最終評級結果，
-      不提供任何計算公式。<br><br>
-      評級分為：買入（BUY）、持有（HOLD）、賣出（SELL），
-      數據每日自動更新，提供投資者另一種參考角度。
-    </p>
+    <div class="update-info" id="updateInfo">
+      更新：載入中…
+    </div>
 
-    <table>
+    <table id="sortableTable">
       <thead>
         <tr>
-          <th>股票代碼</th>
-          <th>現價</th>
-          <th>評級</th>
+          <th data-col="0">公司名</th>
+          <th data-col="1">股票代碼</th>
+          <th data-col="2">現價（港幣）</th>
+          <th data-col="3">今日升幅</th>
+          <th data-col="4">評分</th>
         </tr>
       </thead>
       <tbody id="tableBody">
         <tr>
-          <td colspan="3">載入中...</td>
+          <td colspan="5">載入中…</td>
         </tr>
       </tbody>
     </table>
 
     <div class="intro">
-      <strong>聲明：</strong><br>
-      本頁僅作資訊展示用途，不構成任何投資建議。
-      所有評級均來自內部模型計算，僅供參考。
+      關於本股票評分：<br>
+      本股票評分由玄學師金水設計，融合《易經》、陰陽五行與現代分析，
+      僅提供最終評分結果，作為投資參考。
     </div>
 
   </div>

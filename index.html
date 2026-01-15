@@ -6,12 +6,14 @@
   <meta name="description" content="金壬指數 - 綜合評估股票投資價值，自訂玄學風水指標，分數越高投資吸引力越強。每日更新，提供另一視角助投資決策。">
   <meta name="keywords" content="金壬指數,股票評分,風水投資,玄學股票,金水師傅">
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; background-color: #f8f9fa; color: #333; }
+    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; background-color: #f8f9fa; color: #333; margin: 0; }
     h1 { color: #c39953; }
     .intro { font-size: 1.1em; max-width: 700px; margin: 20px auto; line-height: 1.6; }
     #daily-summary { font-size: 1.2em; margin: 30px; color: #c39953; font-weight: bold; min-height: 100px; }
-    button { padding: 15px 40px; font-size: 1.3em; background: #c39953; color: white; border: none; border-radius: 8px; cursor: pointer; }
-    button:hover { background: #a67c3d; }
+    table { width: 100%; max-width: 960px; margin: 0 auto; border-collapse: collapse; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-radius: 8px; overflow: hidden; }
+    th, td { padding: 16px; text-align: center; border-bottom: 1px solid #e0e0e0; }
+    th { background-color: #c39953; color: white; cursor: pointer; }
+    .loading { color: #666; }
   </style>
 </head>
 <body>
@@ -19,32 +21,62 @@
   
   <p class="intro">綜合評估股票投資價值的自訂指標，融合五行、陰陽、易經與風水智慧。<br>分數越高，投資吸引力越強。每日更新，提供獨特視角助您決策。</p>
   
-  <div id="daily-summary">載入每日最高分中...</div>
+  <div id="daily-summary" class="loading">載入每日摘要中...</div>
   
-  <button onclick="window.open('https://script.google.com/macros/s/AKfycbyyWr5raaBRSXJPQcdn4tM7MsdtRsvLxeDr2JPklgehnNqouu91R_CfKowcoluEM54D/exec', '_blank')">
-    立即查看完整評分表格（僅限本人）
-  </button>
+  <div id="table-container" style="display:none;">
+    <h2>完整評分表格（每日更新）</h2>
+    <table id="sortableTable">
+      <thead id="tableHead"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
 
-<script>
-  // 用你現在的 JSON 端點（如果網址沒變就保持；變了就換成新網址）
-  const jsonUrl = 'https://script.google.com/macros/s/AKfycbxrOO7MIdL3UWN0HYN-2okkzc8p3vHjpRp8zpCVPQnP9lp17DpZFF7Ye4G7mXy_ItGEuA/exec';
+  <script>
+    // 你的 JSON 端點（加 ?mode=json）
+    const jsonUrl = 'https://script.google.com/macros/s/你的ID/exec?mode=json';
 
-  fetch(jsonUrl)
-    .then(response => {
-      if (!response.ok) throw new Error('連線失敗 ' + response.status);
-      return response.json();
-    })
-    .then(data => {
-      document.getElementById('daily-summary').innerHTML = 
-        `最新更新：${data.date}<br>` +
-        `今日最多推薦：${data.mostRecommended} (${data.count} 檔)<br>` +
-        `持有：${data.holdingCount} | 買入：${data.buyCount} | 賣出：${data.sellCount}<br>` +
-        `<small>${data.message} (${data.debug})</small>`;
-    })
-    .catch(error => {
-      document.getElementById('daily-summary').innerHTML = 
-        '每日摘要載入失敗<br>錯誤：' + error.message;
-    });
-</script>
+    fetch(jsonUrl)
+      .then(response => {
+        if (!response.ok) throw new Error('連線失敗 ' + response.status);
+        return response.json();
+      })
+      .then(data => {
+        // 顯示摘要
+        document.getElementById('daily-summary').innerHTML = 
+          `最新更新：${data.date}<br>` +
+          `<small>${data.message}</small>`;
+
+        // 產生表格
+        const head = document.getElementById('tableHead');
+        const body = document.getElementById('tableBody');
+
+        // 標頭
+        const headerRow = document.createElement('tr');
+        data.headers.forEach(h => {
+          const th = document.createElement('th');
+          th.textContent = h;
+          headerRow.appendChild(th);
+        });
+        head.appendChild(headerRow);
+
+        // 資料行
+        data.rows.forEach(row => {
+          const tr = document.createElement('tr');
+          row.forEach(cell => {
+            const td = document.createElement('td');
+            td.textContent = cell || '';
+            tr.appendChild(td);
+          });
+          body.appendChild(tr);
+        });
+
+        // 顯示表格
+        document.getElementById('table-container').style.display = 'block';
+      })
+      .catch(error => {
+        document.getElementById('daily-summary').innerHTML = 
+          '載入失敗<br>錯誤：' + error.message;
+      });
+  </script>
 </body>
 </html>

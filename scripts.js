@@ -44,6 +44,18 @@ fetch(CSV_URL)
       '<tr><td colspan="5">資料載入失敗</td></tr>';
   });
 
+function setUpdateTime() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+
+  document.getElementById('updateTime').innerText =
+    `更新：${yyyy}-${mm}-${dd}`;
+}
+
+setUpdateTime();
+
 function formatRating(text) {
   if (text === '買入') return '<span style="color:#1a7f37;font-weight:bold;">買入</span>';
   if (text === '賣出') return '<span style="color:#cf222e;font-weight:bold;">賣出</span>';

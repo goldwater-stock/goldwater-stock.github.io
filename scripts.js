@@ -8,67 +8,41 @@ fetch(CSV_URL)
 
     tbody.innerHTML = '';
 
-    // 假設 CSV 欄位：
-    // 公司名,股票代碼,現價,升幅,評分,更新日期
+    // 從第 2 行開始（跳過 header）
     for (let i = 1; i < lines.length; i++) {
       const cols = lines[i].split(',');
 
+      // 欄位對齊你的實際資料
+      const company = cols[0];
+      const code = cols[1];
+      const price = cols[2];
+      const rise = cols[3];     // 已經是 1.6%
+      const rating = cols[4];   // 中文：買入 / 持有 / 賣出
+
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="font-weight:bold;">${cols[0]}</td>
-        <td>${cols[1]}</td>
-        <td>${cols[2]}</td>
-        <td>${formatRise(cols[3])}</td>
-        <td>${cols[4]}</td>
+        <td style="font-weight:bold; font-size:1.05em;">${company}</td>
+        <td>${code}</td>
+        <td>${price}</td>
+        <td>${rise}</td>
+        <td>${formatRating(rating)}</td>
       `;
       tbody.appendChild(tr);
-
-      // 更新日期只取第一筆
-      if (i === 1 && cols[5]) {
-        document.getElementById('updateInfo').innerText =
-          '更新：' + cols[5];
-      }
     }
 
     initSorting();
+  })
+  .catch(() => {
+    document.getElementById('tableBody').innerHTML =
+      '<tr><td colspan="5">資料載入失敗</td></tr>';
   });
 
-function formatRise(val) {
-  const num = parseFloat(val);
-  if (isNaN(num)) return val;
-  return (num * 100).toFixed(2) + '%';
-}
+/* === 評分顯示（對齊你原本的語意） === */
+function formatRating(text) {
+  let color = '#333';
 
-/* === 表格排序（來自你原 scripts.html 行為） === */
-function initSorting() {
-  const table = document.getElementById('sortableTable');
-  const headers = table.querySelectorAll('th');
-  let sortDirection = {};
+  if (text === '買入') color = '#1a7f37';
+  if (text === '賣出') color = '#cf222e';
+  if (text === '持有') color = '#666';
 
-  headers.forEach((header, index) => {
-    header.addEventListener('click', () => {
-      sortTable(index);
-    });
-  });
-
-  function sortTable(colIndex) {
-    const tbody = table.querySelector('tbody');
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-    const asc = !sortDirection[colIndex];
-    sortDirection[colIndex] = asc;
-
-    rows.sort((a, b) => {
-      const A = a.children[colIndex].innerText;
-      const B = b.children[colIndex].innerText;
-      const numA = parseFloat(A.replace('%',''));
-      const numB = parseFloat(B.replace('%',''));
-
-      if (!isNaN(numA) && !isNaN(numB)) {
-        return asc ? numA - numB : numB - numA;
-      }
-      return asc ? A.localeCompare(B) : B.localeCompare(A);
-    });
-
-    rows.forEach(row => tbody.appendChild(row));
-  }
-}
+  return `<span style="color:${color}; font-weight:b

@@ -25,31 +25,26 @@
     立即查看完整評分表格（僅限本人）
   </button>
 
-  <script>
-    // 這裡用你測試成功的 JSON 端點（從全新專案）
-    const jsonUrl = 'https://script.google.com/macros/s/AKfycbxrOO7MIdL3UWN0HYN-2okkzc8p3vHjpRp8zpCVPQnP9lp17DpZFF7Ye4G7mXy_ItGEuA/exec';
+<script>
+  // 用你現在的 JSON 端點（如果網址沒變就保持；變了就換成新網址）
+  const jsonUrl = 'https://script.google.com/macros/s/AKfycbxrOO7MIdL3UWN0HYN-2okkzc8p3vHjpRp8zpCVPQnP9lp17DpZFF7Ye4G7mXy_ItGEuA/exec';
 
-    console.log('開始 fetch JSON，從：' + jsonUrl);  // 方便除錯
-
-    fetch(jsonUrl)
-      .then(response => {
-        console.log('回應狀態：', response.status);  // 除錯用
-        if (!response.ok) throw new Error('連線失敗，狀態碼：' + response.status);
-        return response.json();
-      })
-      .then(data => {
-        console.log('成功收到資料：', data);  // 除錯用
-        document.getElementById('daily-summary').innerHTML = 
-          `最新更新：${data.date}<br>` +
-          `今日最高分：${data.topStock}<br>` +
-          `分數：${data.topScore} 分<br>` +
-          `<small>${data.message} (${data.debug})</small>`;
-      })
-      .catch(error => {
-        console.error('Fetch 錯誤：', error);  // 除錯用
-        document.getElementById('daily-summary').innerHTML = 
-          '每日摘要載入失敗<br>錯誤：' + error.message + '<br>請用無痕模式 + Ctrl+F5 重新載入，或檢查 console (F12)';
-      });
-  </script>
+  fetch(jsonUrl)
+    .then(response => {
+      if (!response.ok) throw new Error('連線失敗 ' + response.status);
+      return response.json();
+    })
+    .then(data => {
+      document.getElementById('daily-summary').innerHTML = 
+        `最新更新：${data.date}<br>` +
+        `今日最多推薦：${data.mostRecommended} (${data.count} 檔)<br>` +
+        `持有：${data.holdingCount} | 買入：${data.buyCount} | 賣出：${data.sellCount}<br>` +
+        `<small>${data.message} (${data.debug})</small>`;
+    })
+    .catch(error => {
+      document.getElementById('daily-summary').innerHTML = 
+        '每日摘要載入失敗<br>錯誤：' + error.message;
+    });
+</script>
 </body>
 </html>

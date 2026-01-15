@@ -6,31 +6,11 @@
   <meta name="description" content="金壬指數 - 綜合評估股票投資價值，自訂玄學風水指標，分數越高投資吸引力越強。每日更新，提供另一視角助投資決策。">
   <meta name="keywords" content="金壬指數,股票評分,風水投資,玄學股票,金水師傅">
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      text-align: center; 
-      padding: 40px; 
-      background-color: #f8f9fa; 
-      color: #333;
-    }
+    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; background-color: #f8f9fa; color: #333; }
     h1 { color: #c39953; }
     .intro { font-size: 1.1em; max-width: 700px; margin: 20px auto; line-height: 1.6; }
-    #daily-summary { 
-      font-size: 1.2em; 
-      margin: 30px; 
-      color: #c39953; 
-      font-weight: bold; 
-      min-height: 80px; /* 避免載入時跳動 */
-    }
-    button { 
-      padding: 15px 40px; 
-      font-size: 1.3em; 
-      background: #c39953; 
-      color: white; 
-      border: none; 
-      border-radius: 8px; 
-      cursor: pointer; 
-    }
+    #daily-summary { font-size: 1.2em; margin: 30px; color: #c39953; font-weight: bold; min-height: 100px; }
+    button { padding: 15px 40px; font-size: 1.3em; background: #c39953; color: white; border: none; border-radius: 8px; cursor: pointer; }
     button:hover { background: #a67c3d; }
   </style>
 </head>
@@ -41,17 +21,17 @@
   
   <div id="daily-summary">載入每日最高分中...</div>
   
-  <button onclick="window.open('https://script.google.com/macros/s/AKfycbxNtBAPVqQFuot2xk18CCNe8UJsZLGrhRo5SzRvH23evNctNllqez5Qg3V3n6RuS-GsZA/exec', '_blank')">
+  <button onclick="window.open('https://script.google.com/macros/s/AKfycbyyWr5raaBRSXJPQcdn4tM7MsdtRsvLxeDr2JPklgehnNqouu91R_CfKowcoluEM54D/exec', '_blank')">
     立即查看完整評分表格（僅限本人）
   </button>
 
   <script>
-    // ←←← 這裡換成你新部署的 JSON 端點網址！！
-    const jsonUrl = 'https://script.google.com/macros/s/AKfycbxNtBAPVqQFuot2xk18CCNe8UJsZLGrhRo5SzRvH23evNctNllqez5Qg3V3n6RuS-GsZA/exec';
+    // 用你的新 JSON 端點（全新專案的）
+    const jsonUrl = 'https://script.google.com/macros/s/AKfycbxrOO7MIdL3UWN0HYN-2okkzc8p3vHjpRp8zpCVPQnP9lp17DpZFF7Ye4G7mXy_ItGEuA/exec';
 
     fetch(jsonUrl)
       .then(response => {
-        if (!response.ok) throw new Error('網路回應不正常');
+        if (!response.ok) throw new Error('連線失敗 ' + response.status);
         return response.json();
       })
       .then(data => {
@@ -59,12 +39,11 @@
           `最新更新：${data.date}<br>` +
           `今日最高分：${data.topStock}<br>` +
           `分數：${data.topScore} 分<br>` +
-          `<small>${data.message || '金壬指數每日最高分'}</small>`;
+          `<small>${data.message} (${data.debug})</small>`;
       })
       .catch(error => {
-        console.error('Fetch 錯誤:', error); // 方便你檢查
         document.getElementById('daily-summary').innerHTML = 
-          '每日摘要暫時無法載入（可能網路問題或端點未公開）<br>請稍後再試～';
+          '每日摘要載入失敗<br>錯誤：' + error.message + '<br>請用無痕模式重新載入頁面';
       });
   </script>
 </body>

@@ -1,49 +1,92 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-HK">
 <head>
-  <meta charset="UTF-8">
-  <title>金壬指數評分入口</title>
-  <meta name="description" content="金壬指數 - 綜合評估股票投資價值，自訂玄學風水指標，分數越高投資吸引力越強。每日更新，提供另一視角助投資決策。">
-  <meta name="keywords" content="金壬指數,股票評分,風水投資,玄學股票,金水師傅">
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; background-color: #f8f9fa; color: #333; }
-    h1 { color: #c39953; }
-    .intro { font-size: 1.1em; max-width: 700px; margin: 20px auto; line-height: 1.6; }
-    #daily-summary { font-size: 1.2em; margin: 30px; color: #c39953; font-weight: bold; min-height: 100px; }
-    .error { color: red; font-weight: bold; }
-  </style>
+<meta charset="UTF-8">
+<title>股票評級排行榜</title>
+<meta name="description" content="每日自動更新的股票評級排行榜，只顯示結果，不公開計算方法。">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f6f7f9;
+  padding: 40px;
+}
+h1 {
+  text-align: center;
+}
+table {
+  width: 100%;
+  max-width: 900px;
+  margin: 30px auto;
+  border-collapse: collapse;
+  background: #fff;
+}
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+th {
+  background: #222;
+  color: #fff;
+}
+.buy { color: green; font-weight: bold; }
+.sell { color: red; font-weight: bold; }
+.hold { color: #666; font-weight: bold; }
+</style>
 </head>
+
 <body>
-  <h1>金壬指數評分</h1>
-  
-  <p class="intro">綜合評估股票投資價值的自訂指標，融合五行、陰陽、易經與風水智慧。<br>分數越高，投資吸引力越強。每日更新，提供獨特視角助您決策。</p>
-  
-  <div id="daily-summary">載入每日摘要中...</div>
-  
-  <button onclick="window.open('https://script.google.com/macros/s/AKfycbworTqDWlMhPmQh0iO-M2P9qck_F-JcooURftsvMDJZArmhAH7fS56jdxZjCORfRjGO6A/exec', '_blank')">
-    立即查看完整評分表格（僅限本人）
-  </button>
+
+<h1>股票評級排行榜</h1>
+
+<table id="stockTable">
+  <thead>
+    <tr>
+      <th>股票</th>
+      <th>現價</th>
+      <th>評級</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
 <script>
-  // 用你現在成功的 JSON 端點（網址不變就保持；如果新部署了就換）
-  const jsonUrl = 'https://script.google.com/macros/s/AKfycbworTqDWlMhPmQh0iO-M2P9qck_F-JcooURftsvMDJZArmhAH7fS56jdxZjCORfRjGO6A/exec';
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/19XPT1AYnfrGKw6jheOG-t_rsjJkGDy0GPaWUaAvDKXw/edit?usp=sharing';
 
-  fetch(jsonUrl)
-    .then(response => {
-      if (!response.ok) throw new Error('連線失敗 ' + response.status);
-      return response.json();
-    })
-    .then(data => {
-      document.getElementById('daily-summary').innerHTML = 
-        `最新更新：${data.date}<br>` +
-        `今日最多推薦：${data.mostRecommended} (${data.count} 檔)<br>` +
-        `持有：${data.holdingCount} | 買入：${data.buyCount} | 賣出：${data.sellCount}<br>` +
-        `<small>${data.message} (${data.debug})</small>`;
-    })
-    .catch(error => {
-      document.getElementById('daily-summary').innerHTML = 
-        '每日摘要載入失敗<br>錯誤：' + error.message + '<br>請用無痕模式 + Ctrl+F5 重新載入';
-    });
+fetch(CSV_URL)
+  .then(r => r.text())
+  .then(csv => {
+    const lines = csv.trim().split('\n');
+    const tbody = document.querySelector('#stockTable tbody');
+
+    // 跳過 header
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(',');
+      const code = cols[0];
+      const price = cols[1];
+      const rating = cols[2];
+
+      let cls = '';
+      if (rating === 'BUY') cls = 'buy';
+      if (rating === 'SELL') cls = 'sell';
+      if (rating === 'HOLD') cls = 'hold';
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${code}</td>
+        <td>${price}</td>
+        <td class="${cls}">${rating}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  })
+  .catch(err => {
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<p style="color:red;text-align:center;">資料載入失敗</p>'
+    );
+  });
 </script>
+
 </body>
 </html>

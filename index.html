@@ -21,20 +21,24 @@
   
   <div id="daily-summary">載入每日最高分中...</div>
   
-  <button onclick="window.open('https://script.google.com/macros/s/AKfycbworTqDWlMhPmQh0iO-M2P9qck_F-JcooURftsvMDJZArmhAH7fS56jdxZjCORfRjGO6A/exec', '_blank')">
+  <button onclick="window.open('https://script.google.com/macros/s/AKfycbyyWr5raaBRSXJPQcdn4tM7MsdtRsvLxeDr2JPklgehnNqouu91R_CfKowcoluEM54D/exec', '_blank')">
     立即查看完整評分表格（僅限本人）
   </button>
 
   <script>
-    // 用你的新 JSON 端點（全新專案的）
-    const jsonUrl = 'https://script.google.com/macros/s/AKfycbworTqDWlMhPmQh0iO-M2P9qck_F-JcooURftsvMDJZArmhAH7fS56jdxZjCORfRjGO6A/exec';
+    // 這裡用你測試成功的 JSON 端點（從全新專案）
+    const jsonUrl = 'https://script.google.com/macros/s/AKfycbxrOO7MIdL3UWN0HYN-2okkzc8p3vHjpRp8zpCVPQnP9lp17DpZFF7Ye4G7mXy_ItGEuA/exec';
+
+    console.log('開始 fetch JSON，從：' + jsonUrl);  // 方便除錯
 
     fetch(jsonUrl)
       .then(response => {
-        if (!response.ok) throw new Error('連線失敗 ' + response.status);
+        console.log('回應狀態：', response.status);  // 除錯用
+        if (!response.ok) throw new Error('連線失敗，狀態碼：' + response.status);
         return response.json();
       })
       .then(data => {
+        console.log('成功收到資料：', data);  // 除錯用
         document.getElementById('daily-summary').innerHTML = 
           `最新更新：${data.date}<br>` +
           `今日最高分：${data.topStock}<br>` +
@@ -42,8 +46,9 @@
           `<small>${data.message} (${data.debug})</small>`;
       })
       .catch(error => {
+        console.error('Fetch 錯誤：', error);  // 除錯用
         document.getElementById('daily-summary').innerHTML = 
-          '每日摘要載入失敗<br>錯誤：' + error.message + '<br>請用無痕模式重新載入頁面';
+          '每日摘要載入失敗<br>錯誤：' + error.message + '<br>請用無痕模式 + Ctrl+F5 重新載入，或檢查 console (F12)';
       });
   </script>
 </body>

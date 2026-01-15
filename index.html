@@ -3,35 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <title>金壬指數評分入口</title>
+  <meta name="description" content="金壬指數 - 綜合評估股票投資價值，自訂玄學風水指標，分數越高投資吸引力越強。每日更新，提供另一視角助投資決策。">
+  <meta name="keywords" content="金壬指數,股票評分,風水投資,玄學股票,金水師傅">
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
-    #summary { font-size: 1.2em; margin: 20px; color: #c39953; }
-    button { padding: 15px 30px; font-size: 1.2em; background: #c39953; color: white; border: none; cursor: pointer; }
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      padding: 40px; 
+      background-color: #f8f9fa; 
+      color: #333;
+    }
+    h1 { color: #c39953; }
+    .intro { font-size: 1.1em; max-width: 700px; margin: 20px auto; line-height: 1.6; }
+    #daily-summary { font-size: 1.2em; margin: 30px; color: #c39953; font-weight: bold; }
+    button { 
+      padding: 15px 40px; 
+      font-size: 1.3em; 
+      background: #c39953; 
+      color: white; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+    }
+    button:hover { background: #a67c3d; }
   </style>
 </head>
 <body>
   <h1>金壬指數評分</h1>
-  <p class="intro">綜合評估股票投資價值的自訂指標，分數越高投資吸引力越強。</p>
   
-  <div id="daily-summary">載入中...</div>
+  <p class="intro">綜合評估股票投資價值的自訂指標，融合五行、陰陽、易經與風水智慧。<br>分數越高，投資吸引力越強。每日更新，提供獨特視角助您決策。</p>
   
-  <button onclick="window.open('您的 Apps Script 完整網址/exec', '_blank')">立即查看完整評分表格</button>
+  <div id="daily-summary">每日最高分摘要（開發中，測試階段暫不顯示）</div>
+  
+  <button onclick="window.open('https://script.google.com/macros/s/AKfycbyyWr5raaBRSXJPQcdn4tM7MsdtRsvLxeDr2JPklgehnNqouu91R_CfKowcoluEM54D/exec', '_blank')">
+    立即查看完整評分表格（僅限本人）
+  </button>
 
+  <!-- 之後要開啟每日摘要時，再把下面這段打開 -->
+  <!--
   <script>
-    const csvUrl = 'https://script.google.com/macros/s/AKfycbyyWr5raaBRSXJPQcdn4tM7MsdtRsvLxeDr2JPklgehnNqouu91R_CfKowcoluEM54D/exec';
+    const jsonUrl = 'https://script.google.com/macros/s/你的公開JSON端點ID/exec';  // 之後換成公開的 JSON 網址
 
-    fetch(csvUrl)
-      .then(response => response.text())
-      .then(csvText => {
-        const rows = csvText.split('\n').map(row => row.split(','));
-        // 假設 B3 是分數最高的一行（或您自行解析）
-        const today = new Date().toISOString().split('T')[0];
+    fetch(jsonUrl)
+      .then(response => response.json())
+      .then(data => {
         document.getElementById('daily-summary').innerHTML = 
-          `最新更新：${today}<br>今日最高分股票：${rows[3][0] || '載入中'}（分數：${rows[3][1] || 'N/A'}）`;
+          `最新更新：${data.date}<br>今日最高分：${data.topStock}（${data.topScore}分）`;
       })
-      .catch(error => {
-        document.getElementById('daily-summary').innerHTML = '資料載入失敗，請稍後再試。';
+      .catch(() => {
+        document.getElementById('daily-summary').innerHTML = '每日摘要載入中...';
       });
   </script>
+  -->
 </body>
 </html>

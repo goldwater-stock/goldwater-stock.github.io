@@ -1,14 +1,18 @@
 <!doctype html>
-<html>
+<html lang="zh-HK">
 <head>
   <meta charset="utf-8">
+
+  <!-- 關鍵：手機 100% 寬一定要有 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>金融股評分</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <header>
-  <h1>金融</h1>
+  <h1>股票評分</h1>
   <nav>
     <a href="index.html">主頁</a>
     <a class="active" href="finance.html">金融</a>
@@ -23,16 +27,20 @@
 </header>
 
 <main class="main">
+
+  <!-- ✅ 結構必須和 index.html 一樣 -->
   <div class="columns">
-    <div class="column">
+
+    <div class="column" data-col="col-finance">
       <h2>金融</h2>
       <div id="stocks"></div>
     </div>
+
   </div>
+
 </main>
 
 <script src="js/app.js"></script>
-
 
 </body>
 </html>

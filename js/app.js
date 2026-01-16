@@ -1,11 +1,14 @@
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQndjBqUVsGNWfRpgZzwiuoum6dRsQuIEvouN3D7za_DHgIl-X3nVrVs13VxA7MvIPIau32if2ntiAS/pub?gid=241210704&single=true&output=csv';
 
+
 const TARGET_COLUMNS = [
   'col-finance',
   'col-property',
   'col-tech',
   'col-consumer'
 ];
+
+const STORAGE_KEY = 'columnOrder';
 
 fetch(CSV_URL)
   .then(res => res.text())
@@ -34,6 +37,7 @@ fetch(CSV_URL)
       });
     });
 
+    restoreColumnOrder();
     enableColumnDrag();
   });
 
@@ -45,7 +49,32 @@ function ratingClass(r) {
 }
 
 /* =========================
-   Column Drag & Reorder
+   Column Order Persistence
+   ========================= */
+
+function restoreColumnOrder() {
+  const container = document.querySelector('.columns');
+  if (!container) return;
+
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  if (!saved) return;
+
+  saved.forEach(id => {
+    const col = container.querySelector(`[data-col="${id}"]`);
+    if (col) container.appendChild(col);
+  });
+}
+
+function saveColumnOrder() {
+  const container = document.querySelector('.columns');
+  const order = [...container.children].map(
+    col => col.dataset.col
+  );
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
+}
+
+/* =========================
+   Drag & Drop
    ========================= */
 
 function enableColumnDrag() {
@@ -64,8 +93,9 @@ function enableColumnDrag() {
     });
 
     col.addEventListener('dragend', () => {
-      dragging = null;
       col.classList.remove('dragging');
+      dragging = null;
+      saveColumnOrder(); // ← 拖完立刻存
     });
   });
 
@@ -89,13 +119,12 @@ function getAfterColumn(container, x) {
       const offset = x - box.left - box.width / 2;
       if (offset < 0 && offset > closest.offset) {
         return { offset, element: col };
-      } else {
-        return closest;
       }
+      return closest;
     },
     { offset: Number.NEGATIVE_INFINITY }
-  ).element;
-}
+  ).e
+
 
 
 

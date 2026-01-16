@@ -124,6 +124,28 @@ nav a.active {
 .hold { color: #666; }
 .sell { color: #d33; }
 
+.stock-header,
+.stock {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr 1fr 1fr 0.8fr;
+  column-gap: 8px;
+}
+
+.stock-header {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.stock-header div {
+  cursor: pointer;
+  user-select: none;
+}
+
+.stock-header div:hover {
+  text-decoration: underline;
+}
 
 
 @media (max-width: 768px) {

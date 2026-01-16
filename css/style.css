@@ -44,7 +44,7 @@ nav a.active {
   font-weight: 600;
 }
 
-/* Main columns layout */
+/* Main layout */
 .main {
   max-width: 1400px;
   margin: 20px auto;
@@ -62,8 +62,6 @@ nav a.active {
   background: #fff;
   border-radius: 14px;
   padding: 16px;
-  display: flex;
-  flex-direction: column;
 }
 
 .column h2 {
@@ -71,10 +69,15 @@ nav a.active {
   font-size: 16px;
 }
 
-/* Stock list */
+/* Stock row – 五欄 */
 .stock {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns:
+    1.6fr   /* 名稱 */
+    0.8fr   /* 代碼 */
+    1fr     /* 價格 */
+    1fr     /* 升跌 */
+    0.8fr;  /* 評級 */
   gap: 8px;
   padding: 10px 0;
   border-bottom: 1px solid #eee;
@@ -89,12 +92,18 @@ nav a.active {
   font-weight: 500;
 }
 
-.stock .price {
+.stock .code {
+  color: #666;
+}
+
+.stock .price,
+.stock .change {
   text-align: right;
 }
 
 .stock .rating {
   font-weight: 600;
+  text-align: right;
 }
 
 /* Rating colors */

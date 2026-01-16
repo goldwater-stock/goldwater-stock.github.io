@@ -1,6 +1,8 @@
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQndjBqUVsGNWfRpgZzwiuoum6dRsQuIEvouN3D7za_DHgIl-X3nVrVs13VxA7MvIPIau32if2ntiAS/pub?gid=241210704&single=true&output=csv';
 
-// index.html 用的欄位
+const CSV_URL =
+  'https://docs.google.com/spreadsheets/d/e/你的ID/pub?gid=241210704&single=true&output=csv';
+
 const TARGET_COLUMNS = [
   'col-finance',
   'col-property',
@@ -8,46 +10,35 @@ const TARGET_COLUMNS = [
   'col-consumer'
 ];
 
-// 讀取 CSV
 fetch(CSV_URL)
   .then(res => res.text())
   .then(text => {
-    const rows = text.trim().split('\n').slice(1); // 跳過 header
+    const rows = text.trim().split('\n').slice(1);
 
-    // index.html（多欄）
     TARGET_COLUMNS.forEach(colId => {
       const container = document.getElementById(colId);
       if (!container) return;
 
-      renderRows(container, rows);
+      rows.forEach(row => {
+        const [name, code, price, change, rating] = row.split(',');
+
+        const div = document.createElement('div');
+        div.className = 'stock';
+
+        div.innerHTML = `
+          <div class="name">${name}</div>
+          <div class="code">${code}</div>
+          <div class="price">${price}</div>
+          <div class="change">${change}</div>
+          <div class="rating ${ratingClass(rating)}">${rating}</div>
+        `;
+
+        container.appendChild(div);
+      });
     });
 
-    // finance.html（單欄）
-    const single = document.getElementById('stocks');
-    if (single) {
-      renderRows(single, rows);
-    }
+    enableColumnDrag();
   });
-
-// 共用渲染函數
-function renderRows(container, rows) {
-  rows.forEach(row => {
-    const [name, code, price, change, rating] = row.split(',');
-
-    const div = document.createElement('div');
-    div.className = 'stock';
-
-    div.innerHTML = `
-      <div class="name">${name}</div>
-      <div class="code">${code}</div>
-      <div class="price">${price}</div>
-      <div class="change">${change}</div>
-      <div class="rating ${ratingClass(rating)}">${rating}</div>
-    `;
-
-    container.appendChild(div);
-  });
-}
 
 function ratingClass(r) {
   if (!r) return 'hold';
@@ -56,6 +47,58 @@ function ratingClass(r) {
   return 'hold';
 }
 
+/* =========================
+   Column Drag & Reorder
+   ========================= */
+
+function enableColumnDrag() {
+  const container = document.querySelector('.columns');
+  if (!container) return;
+
+  let dragging = null;
+
+  container.querySelectorAll('.column').forEach(col => {
+    col.draggable = true;
+
+    col.addEventListener('dragstart', e => {
+      dragging = col;
+      col.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+
+    col.addEventListener('dragend', () => {
+      dragging = null;
+      col.classList.remove('dragging');
+    });
+  });
+
+  container.addEventListener('dragover', e => {
+    e.preventDefault();
+    const after = getAfterColumn(container, e.clientX);
+    if (!after) {
+      container.appendChild(dragging);
+    } else {
+      container.insertBefore(dragging, after);
+    }
+  });
+}
+
+function getAfterColumn(container, x) {
+  const columns = [...container.querySelectorAll('.column:not(.dragging)')];
+
+  return columns.reduce(
+    (closest, col) => {
+      const box = col.getBoundingClientRect();
+      const offset = x - box.left - box.width / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset, element: col };
+      } else {
+        return closest;
+      }
+    },
+    { offset: Number.NEGATIVE_INFINITY }
+  ).element;
+}
 
 
 

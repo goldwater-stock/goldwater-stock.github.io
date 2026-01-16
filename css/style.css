@@ -132,7 +132,9 @@ nav a.active {
     flex: 0 0 100vw;     /* 一個 column = 一整個螢幕 */
     max-width: 100vw;
   }
-
+   .main {
+    padding: 0;          /* ⭐ 關鍵 */
+  }
   .columns {
     scroll-snap-type: x mandatory; /* 手機滑動更準 */
   }

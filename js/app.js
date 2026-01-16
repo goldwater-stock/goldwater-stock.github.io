@@ -1,9 +1,5 @@
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQndjBqUVsGNWfRpgZzwiuoum6dRsQuIEvouN3D7za_DHgIl-X3nVrVs13VxA7MvIPIau32if2ntiAS/pub?gid=241210704&single=true&output=csv';
 
-
-const CSV_URL =
-  'https://docs.google.com/spreadsheets/d/e/你的ID/pub?gid=241210704&single=true&output=csv';
-
 // 所有要填資料的 column（暫時全部用金融）
 const TARGET_COLUMNS = [
   'col-finance',

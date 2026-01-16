@@ -164,8 +164,7 @@ nav a.active {
     grid-template-columns: 1fr auto auto;
     grid-template-areas:
       "name   name   name"
-      "code   price  change"
-      ".      .      rating";
+      "code   price  change  rating";
     row-gap: 4px;
   }
 

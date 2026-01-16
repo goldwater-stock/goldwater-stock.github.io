@@ -12,7 +12,8 @@ const TARGET_COLUMNS = [
   'col-consumer'
 ];
 
-const STORAGE_KEY = 'columnOrder';
+const COLUMN_ORDER_KEY = 'columnOrder';
+const SORT_STATE_KEY = 'sortState';
 
 /* ================================
    Load & Render
@@ -23,27 +24,21 @@ fetch(CSV_URL)
   .then(text => {
     const rows = text.trim().split('\n').slice(1);
 
-    // index.html（多 column）
     TARGET_COLUMNS.forEach(colId => {
       const container = document.getElementById(colId);
       if (!container) return;
-
-      rows.forEach(row => {
-        container.appendChild(createStock(row));
-      });
+      rows.forEach(row => container.appendChild(createStock(row)));
     });
 
-    // finance.html（單 column）
     const single = document.getElementById('stocks');
     if (single) {
-      rows.forEach(row => {
-        single.appendChild(createStock(row));
-      });
+      rows.forEach(row => single.appendChild(createStock(row)));
     }
 
     restoreColumnOrder();
     enableColumnDrag();
     enableSorting();
+    restoreSorting();
   });
 
 /* ================================
@@ -63,7 +58,6 @@ function createStock(row) {
     <div class="change">${change}</div>
     <div class="rating ${ratingClass(rating)}">${rating}</div>
   `;
-
   return div;
 }
 
@@ -75,14 +69,14 @@ function ratingClass(r) {
 }
 
 /* ================================
-   Column Order (Drag)
+   Column Drag
 ================================ */
 
 function restoreColumnOrder() {
   const container = document.querySelector('.columns');
   if (!container) return;
 
-  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  const saved = JSON.parse(localStorage.getItem(COLUMN_ORDER_KEY));
   if (!Array.isArray(saved)) return;
 
   saved.forEach(id => {
@@ -95,8 +89,8 @@ function saveColumnOrder() {
   const container = document.querySelector('.columns');
   if (!container) return;
 
-  const order = [...container.children].map(col => col.dataset.col);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
+  const order = [...container.children].map(c => c.dataset.col);
+  localStorage.setItem(COLUMN_ORDER_KEY, JSON.stringify(order));
 }
 
 function enableColumnDrag() {
@@ -105,7 +99,6 @@ function enableColumnDrag() {
 
   let dragging = null;
 
-  // 禁止非標題區域 drag（關鍵）
   container.querySelectorAll('.stock-header, .stock').forEach(el => {
     el.addEventListener('dragstart', e => {
       e.preventDefault();
@@ -114,8 +107,6 @@ function enableColumnDrag() {
   });
 
   container.querySelectorAll('.column').forEach(col => {
-    col.draggable = false;
-
     const title = col.querySelector('h2');
     if (!title) return;
 
@@ -139,17 +130,13 @@ function enableColumnDrag() {
     if (!dragging) return;
 
     const after = getAfterColumn(container, e.clientX);
-    if (!after) {
-      container.appendChild(dragging);
-    } else {
-      container.insertBefore(dragging, after);
-    }
+    after ? container.insertBefore(dragging, after)
+          : container.appendChild(dragging);
   });
 }
 
 function getAfterColumn(container, x) {
   const cols = [...container.querySelectorAll('.column:not(.dragging)')];
-
   return cols.reduce(
     (closest, col) => {
       const box = col.getBoundingClientRect();
@@ -164,11 +151,11 @@ function getAfterColumn(container, x) {
 }
 
 /* ================================
-   Sorting
+   Sorting (▲ ▼ + persist)
 ================================ */
 
 function enableSorting() {
-  const sortState = {};
+  const state = JSON.parse(localStorage.getItem(SORT_STATE_KEY)) || {};
 
   document.querySelectorAll('.stock-header div').forEach(header => {
     header.addEventListener('click', e => {
@@ -178,31 +165,72 @@ function enableSorting() {
       const column = header.closest('.column');
       if (!column) return;
 
+      const colId = column.dataset.col || 'single';
       const list =
         column.querySelector('[id^="col-"]') ||
         column.querySelector('#stocks');
 
       if (!list) return;
 
-      const items = [...list.querySelectorAll('.stock')];
+      const dir =
+        state[colId]?.key === key && state[colId]?.dir === 'asc'
+          ? 'desc'
+          : 'asc';
 
-      const dir = sortState[key] === 'asc' ? 'desc' : 'asc';
-      sortState[key] = dir;
+      state[colId] = { key, dir };
+      localStorage.setItem(SORT_STATE_KEY, JSON.stringify(state));
 
-      items.sort((a, b) => {
-        const va = getValue(a, key);
-        const vb = getValue(b, key);
-
-        if (typeof va === 'number') {
-          return dir === 'asc' ? va - vb : vb - va;
-        }
-        return dir === 'asc'
-          ? va.localeCompare(vb)
-          : vb.localeCompare(va);
-      });
-
-      items.forEach(item => list.appendChild(item));
+      applySort(column, list, key, dir);
+      updateHeaderIcons(column, key, dir);
     });
+  });
+}
+
+function restoreSorting() {
+  const state = JSON.parse(localStorage.getItem(SORT_STATE_KEY));
+  if (!state) return;
+
+  document.querySelectorAll('.column').forEach(column => {
+    const colId = column.dataset.col || 'single';
+    const s = state[colId];
+    if (!s) return;
+
+    const list =
+      column.querySelector('[id^="col-"]') ||
+      column.querySelector('#stocks');
+
+    if (!list) return;
+
+    applySort(column, list, s.key, s.dir);
+    updateHeaderIcons(column, s.key, s.dir);
+  });
+}
+
+function applySort(column, list, key, dir) {
+  const items = [...list.querySelectorAll('.stock')];
+
+  items.sort((a, b) => {
+    const va = getValue(a, key);
+    const vb = getValue(b, key);
+
+    if (typeof va === 'number') {
+      return dir === 'asc' ? va - vb : vb - va;
+    }
+    return dir === 'asc'
+      ? va.localeCompare(vb)
+      : vb.localeCompare(va);
+  });
+
+  items.forEach(i => list.appendChild(i));
+}
+
+function updateHeaderIcons(column, key, dir) {
+  column.querySelectorAll('.stock-header div').forEach(h => {
+    const base = h.textContent.replace(/[▲▼]/g, '').trim();
+    h.textContent = base;
+    if (h.dataset.key === key) {
+      h.textContent = base + (dir === 'asc' ? ' ▲' : ' ▼');
+    }
   });
 }
 
@@ -210,12 +238,9 @@ function getValue(stock, key) {
   const el = stock.querySelector(`.${key}`);
   if (!el) return '';
 
-  let text = el.textContent.trim();
-
+  let t = el.textContent.trim();
   if (key === 'price' || key === 'change') {
-    text = text.replace('%', '').replace('+', '');
-    return parseFloat(text) || 0;
+    return parseFloat(t.replace('%', '').replace('+', '')) || 0;
   }
-
-  return text;
+  return t;
 }

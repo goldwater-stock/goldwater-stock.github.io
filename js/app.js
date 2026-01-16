@@ -44,8 +44,8 @@ function createStock(row) {
   div.className = 'stock';
 
   div.innerHTML = `
-    <div class="name">${name}</div>
     <div class="code">${code}</div>
+    <div class="name">${name}</div>
     <div class="price">${price}</div>
     <div class="change">${change}</div>
     <div class="rating ${ratingClass(rating)}">${rating}</div>

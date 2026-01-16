@@ -87,8 +87,8 @@ nav a.active {
   display: grid;
   grid-template-columns:
     1.0fr
-    0.8fr
     1.2fr
+    1.0fr
     0.6fr
     0.8fr;
   gap: 8px;
@@ -103,17 +103,18 @@ nav a.active {
 
 .stock .name {
   font-weight: 500;
+  color: #666;
 }
 
 .stock .code {
   color: #666;
-  text-align: right;
+  text-align: left;
 }
 
 .stock .price,
 .stock .change,
 .stock .rating {
-  text-align: right;
+  text-align: center;
   color: #666;
 }
 

@@ -159,12 +159,13 @@ nav a.active {
     font-size: 0.9rem; /* 整體字體稍小 */
   }
 
-  /* 手機 stock 改為兩行結構 */
+
   .stock {
-    grid-template-columns: 1fr auto auto;
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
     grid-template-areas:
-      "name   name   name"
-      "code   price  change  rating";
+      "name   name   name   name"
+      "code   price  change rating";
     row-gap: 4px;
   }
 
@@ -181,14 +182,16 @@ nav a.active {
 
   .stock .price {
     grid-area: price;
+    text-align: right;
   }
 
   .stock .change {
     grid-area: change;
+    text-align: right;
   }
 
   .stock .rating {
     grid-area: rating;
+    text-align: right;
   }
-
 }

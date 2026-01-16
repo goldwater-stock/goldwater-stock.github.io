@@ -15,7 +15,6 @@ fetch(CSV_URL)
   .then(text => {
     const rows = text.trim().split('\n').slice(1);
 
-    // ===== index.html（多 column）=====
     TARGET_COLUMNS.forEach(colId => {
       const container = document.getElementById(colId);
       if (!container) return;
@@ -25,7 +24,6 @@ fetch(CSV_URL)
       });
     });
 
-    // ===== finance.html（單 column）=====
     const single = document.getElementById('stocks');
     if (single) {
       rows.forEach(row => {
@@ -44,8 +42,8 @@ function createStock(row) {
   div.className = 'stock';
 
   div.innerHTML = `
-    <div class="code">${code}</div>
     <div class="name">${name}</div>
+    <div class="code">${code}</div>
     <div class="price">${price}</div>
     <div class="change">${change}</div>
     <div class="rating ${ratingClass(rating)}">${rating}</div>
@@ -82,7 +80,7 @@ function saveColumnOrder() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
 }
 
-/* ===== Drag & Drop ===== */
+/* ===== Drag only by title ===== */
 
 function enableColumnDrag() {
   const container = document.querySelector('.columns');
@@ -91,15 +89,21 @@ function enableColumnDrag() {
   let dragging = null;
 
   container.querySelectorAll('.column').forEach(col => {
-    col.draggable = true;
+    col.draggable = false; // ⭐ column 本身不能拖
 
-    col.addEventListener('dragstart', e => {
+    const title = col.querySelector('h2');
+    if (!title) return;
+
+    title.draggable = true; // ⭐ 只有標題能拖
+    title.style.cursor = 'grab';
+
+    title.addEventListener('dragstart', e => {
       dragging = col;
       col.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
     });
 
-    col.addEventListener('dragend', () => {
+    title.addEventListener('dragend', () => {
       col.classList.remove('dragging');
       dragging = null;
       saveColumnOrder();
@@ -109,6 +113,8 @@ function enableColumnDrag() {
   container.addEventListener('dragover', e => {
     e.preventDefault();
     const after = getAfterColumn(container, e.clientX);
+    if (!dragging) return;
+
     if (!after) {
       container.appendChild(dragging);
     } else {

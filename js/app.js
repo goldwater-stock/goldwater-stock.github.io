@@ -1,3 +1,7 @@
+/* ================================
+   Config
+================================ */
+
 const CSV_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vQndjBqUVsGNWfRpgZzwiuoum6dRsQuIEvouN3D7za_DHgIl-X3nVrVs13VxA7MvIPIau32if2ntiAS/pub?gid=241210704&single=true&output=csv';
 
@@ -10,11 +14,16 @@ const TARGET_COLUMNS = [
 
 const STORAGE_KEY = 'columnOrder';
 
+/* ================================
+   Load & Render
+================================ */
+
 fetch(CSV_URL)
   .then(res => res.text())
   .then(text => {
     const rows = text.trim().split('\n').slice(1);
 
+    // index.html（多 column）
     TARGET_COLUMNS.forEach(colId => {
       const container = document.getElementById(colId);
       if (!container) return;
@@ -24,6 +33,7 @@ fetch(CSV_URL)
       });
     });
 
+    // finance.html（單 column）
     const single = document.getElementById('stocks');
     if (single) {
       rows.forEach(row => {
@@ -33,7 +43,12 @@ fetch(CSV_URL)
 
     restoreColumnOrder();
     enableColumnDrag();
+    enableSorting();
   });
+
+/* ================================
+   Stock Row
+================================ */
 
 function createStock(row) {
   const [name, code, price, change, rating] = row.split(',');
@@ -42,8 +57,8 @@ function createStock(row) {
   div.className = 'stock';
 
   div.innerHTML = `
-    <div class="name">${name}</div>
     <div class="code">${code}</div>
+    <div class="name">${name}</div>
     <div class="price">${price}</div>
     <div class="change">${change}</div>
     <div class="rating ${ratingClass(rating)}">${rating}</div>
@@ -59,7 +74,9 @@ function ratingClass(r) {
   return 'hold';
 }
 
-/* ===== Column order ===== */
+/* ================================
+   Column Order (Drag)
+================================ */
 
 function restoreColumnOrder() {
   const container = document.querySelector('.columns');
@@ -76,11 +93,11 @@ function restoreColumnOrder() {
 
 function saveColumnOrder() {
   const container = document.querySelector('.columns');
+  if (!container) return;
+
   const order = [...container.children].map(col => col.dataset.col);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
 }
-
-/* ===== Drag only by title ===== */
 
 function enableColumnDrag() {
   const container = document.querySelector('.columns');
@@ -88,14 +105,21 @@ function enableColumnDrag() {
 
   let dragging = null;
 
+  // 禁止非標題區域 drag（關鍵）
+  container.querySelectorAll('.stock-header, .stock').forEach(el => {
+    el.addEventListener('dragstart', e => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  });
+
   container.querySelectorAll('.column').forEach(col => {
-    col.draggable = false; // ⭐ column 本身不能拖
+    col.draggable = false;
 
     const title = col.querySelector('h2');
     if (!title) return;
 
-    title.draggable = true; // ⭐ 只有標題能拖
-    title.style.cursor = 'grab';
+    title.draggable = true;
 
     title.addEventListener('dragstart', e => {
       dragging = col;
@@ -112,9 +136,9 @@ function enableColumnDrag() {
 
   container.addEventListener('dragover', e => {
     e.preventDefault();
-    const after = getAfterColumn(container, e.clientX);
     if (!dragging) return;
 
+    const after = getAfterColumn(container, e.clientX);
     if (!after) {
       container.appendChild(dragging);
     } else {
@@ -124,9 +148,9 @@ function enableColumnDrag() {
 }
 
 function getAfterColumn(container, x) {
-  const columns = [...container.querySelectorAll('.column:not(.dragging)')];
+  const cols = [...container.querySelectorAll('.column:not(.dragging)')];
 
-  return columns.reduce(
+  return cols.reduce(
     (closest, col) => {
       const box = col.getBoundingClientRect();
       const offset = x - box.left - box.width / 2;
@@ -139,44 +163,58 @@ function getAfterColumn(container, x) {
   ).element;
 }
 
-const sortState = {};
+/* ================================
+   Sorting
+================================ */
 
-document.querySelectorAll('.stock-header div').forEach(header => {
-  header.addEventListener('click', () => {
-    const key = header.dataset.key;
-    const column = header.closest('.column');
-    const list = column.querySelector('[id^="col-"], #stocks');
-    if (!list) return;
+function enableSorting() {
+  const sortState = {};
 
-    const stocks = [...list.querySelectorAll('.stock')];
+  document.querySelectorAll('.stock-header div').forEach(header => {
+    header.addEventListener('click', e => {
+      e.stopPropagation();
 
-    const dir = sortState[key] === 'asc' ? 'desc' : 'asc';
-    sortState[key] = dir;
+      const key = header.dataset.key;
+      const column = header.closest('.column');
+      if (!column) return;
 
-    stocks.sort((a, b) => {
-      const va = getValue(a, key);
-      const vb = getValue(b, key);
+      const list =
+        column.querySelector('[id^="col-"]') ||
+        column.querySelector('#stocks');
 
-      if (typeof va === 'number') {
-        return dir === 'asc' ? va - vb : vb - va;
-      }
-      return dir === 'asc'
-        ? va.localeCompare(vb)
-        : vb.localeCompare(va);
+      if (!list) return;
+
+      const items = [...list.querySelectorAll('.stock')];
+
+      const dir = sortState[key] === 'asc' ? 'desc' : 'asc';
+      sortState[key] = dir;
+
+      items.sort((a, b) => {
+        const va = getValue(a, key);
+        const vb = getValue(b, key);
+
+        if (typeof va === 'number') {
+          return dir === 'asc' ? va - vb : vb - va;
+        }
+        return dir === 'asc'
+          ? va.localeCompare(vb)
+          : vb.localeCompare(va);
+      });
+
+      items.forEach(item => list.appendChild(item));
     });
-
-    stocks.forEach(s => list.appendChild(s));
   });
-});
+}
 
 function getValue(stock, key) {
   const el = stock.querySelector(`.${key}`);
   if (!el) return '';
 
-  const text = el.textContent.trim();
+  let text = el.textContent.trim();
 
   if (key === 'price' || key === 'change') {
-    return parseFloat(text.replace('%', '').replace('+', '')) || 0;
+    text = text.replace('%', '').replace('+', '');
+    return parseFloat(text) || 0;
   }
 
   return text;

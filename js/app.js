@@ -138,3 +138,46 @@ function getAfterColumn(container, x) {
     { offset: Number.NEGATIVE_INFINITY }
   ).element;
 }
+
+const sortState = {};
+
+document.querySelectorAll('.stock-header div').forEach(header => {
+  header.addEventListener('click', () => {
+    const key = header.dataset.key;
+    const column = header.closest('.column');
+    const list = column.querySelector('[id^="col-"], #stocks');
+    if (!list) return;
+
+    const stocks = [...list.querySelectorAll('.stock')];
+
+    const dir = sortState[key] === 'asc' ? 'desc' : 'asc';
+    sortState[key] = dir;
+
+    stocks.sort((a, b) => {
+      const va = getValue(a, key);
+      const vb = getValue(b, key);
+
+      if (typeof va === 'number') {
+        return dir === 'asc' ? va - vb : vb - va;
+      }
+      return dir === 'asc'
+        ? va.localeCompare(vb)
+        : vb.localeCompare(va);
+    });
+
+    stocks.forEach(s => list.appendChild(s));
+  });
+});
+
+function getValue(stock, key) {
+  const el = stock.querySelector(`.${key}`);
+  if (!el) return '';
+
+  const text = el.textContent.trim();
+
+  if (key === 'price' || key === 'change') {
+    return parseFloat(text.replace('%', '').replace('+', '')) || 0;
+  }
+
+  return text;
+}

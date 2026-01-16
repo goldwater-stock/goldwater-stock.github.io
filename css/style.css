@@ -128,9 +128,9 @@ nav a.active {
 
 @media (max-width: 768px) {
   .column {
-    flex: 0 0 calc(100vw - 32px);
-    max-width: calc(100vw - 32px);
-    font-size: 0.7rem;
+    flex: 0 0 calc(100vw - 14px);
+    max-width: calc(100vw - 14px);
+    font-size: 0.6rem;
   }
   
   .columns {

@@ -131,6 +131,7 @@ nav a.active {
   .column {
     flex: 0 0 calc(100vw - 32px);
     max-width: calc(100vw - 32px);
+    font-size: 0.88rem;
   }
   
   .columns {

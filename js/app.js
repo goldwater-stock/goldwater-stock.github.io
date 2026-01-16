@@ -1,5 +1,5 @@
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQndjBqUVsGNWfRpgZzwiuoum6dRsQuIEvouN3D7za_DHgIl-X3nVrVs13VxA7MvIPIau32if2ntiAS/pub?gid=241210704&single=true&output=csv';
-
+const CSV_URL =
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vQndjBqUVsGNWfRpgZzwiuoum6dRsQuIEvouN3D7za_DHgIl-X3nVrVs13VxA7MvIPIau32if2ntiAS/pub?gid=241210704&single=true&output=csv';
 
 const TARGET_COLUMNS = [
   'col-finance',
@@ -15,31 +15,44 @@ fetch(CSV_URL)
   .then(text => {
     const rows = text.trim().split('\n').slice(1);
 
+    // ===== index.html（多 column）=====
     TARGET_COLUMNS.forEach(colId => {
       const container = document.getElementById(colId);
       if (!container) return;
 
       rows.forEach(row => {
-        const [name, code, price, change, rating] = row.split(',');
-
-        const div = document.createElement('div');
-        div.className = 'stock';
-
-        div.innerHTML = `
-          <div class="name">${name}</div>
-          <div class="code">${code}</div>
-          <div class="price">${price}</div>
-          <div class="change">${change}</div>
-          <div class="rating ${ratingClass(rating)}">${rating}</div>
-        `;
-
-        container.appendChild(div);
+        container.appendChild(createStock(row));
       });
     });
+
+    // ===== finance.html（單 column）=====
+    const single = document.getElementById('stocks');
+    if (single) {
+      rows.forEach(row => {
+        single.appendChild(createStock(row));
+      });
+    }
 
     restoreColumnOrder();
     enableColumnDrag();
   });
+
+function createStock(row) {
+  const [name, code, price, change, rating] = row.split(',');
+
+  const div = document.createElement('div');
+  div.className = 'stock';
+
+  div.innerHTML = `
+    <div class="name">${name}</div>
+    <div class="code">${code}</div>
+    <div class="price">${price}</div>
+    <div class="change">${change}</div>
+    <div class="rating ${ratingClass(rating)}">${rating}</div>
+  `;
+
+  return div;
+}
 
 function ratingClass(r) {
   if (!r) return 'hold';
@@ -48,16 +61,14 @@ function ratingClass(r) {
   return 'hold';
 }
 
-/* =========================
-   Column Order Persistence
-   ========================= */
+/* ===== Column order ===== */
 
 function restoreColumnOrder() {
   const container = document.querySelector('.columns');
   if (!container) return;
 
   const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-  if (!saved) return;
+  if (!Array.isArray(saved)) return;
 
   saved.forEach(id => {
     const col = container.querySelector(`[data-col="${id}"]`);
@@ -67,15 +78,11 @@ function restoreColumnOrder() {
 
 function saveColumnOrder() {
   const container = document.querySelector('.columns');
-  const order = [...container.children].map(
-    col => col.dataset.col
-  );
+  const order = [...container.children].map(col => col.dataset.col);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
 }
 
-/* =========================
-   Drag & Drop
-   ========================= */
+/* ===== Drag & Drop ===== */
 
 function enableColumnDrag() {
   const container = document.querySelector('.columns');
@@ -95,7 +102,7 @@ function enableColumnDrag() {
     col.addEventListener('dragend', () => {
       col.classList.remove('dragging');
       dragging = null;
-      saveColumnOrder(); // ← 拖完立刻存
+      saveColumnOrder();
     });
   });
 
@@ -125,5 +132,3 @@ function getAfterColumn(container, x) {
     { offset: Number.NEGATIVE_INFINITY }
   ).element;
 }
-
-

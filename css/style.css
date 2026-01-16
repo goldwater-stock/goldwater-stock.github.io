@@ -44,40 +44,45 @@ nav a.active {
   font-weight: 600;
 }
 
-/* Main layout */
+/* Main */
 .main {
-  max-width: 1400px;
-  margin: 20px auto;
-  padding: 0 16px;
-}
-
-.columns {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
-}
-
-/* Column card */
-.column {
-  background: #fff;
-  border-radius: 14px;
   padding: 16px;
 }
 
+/* ===== Threads-style horizontal columns ===== */
+
+.columns {
+  display: flex;              /* 關鍵 1：flex */
+  gap: 16px;
+  overflow-x: auto;           /* 關鍵 2：橫向 scroll */
+  scroll-snap-type: x mandatory;
+  padding-bottom: 8px;
+}
+
+/* 每一個 column */
+.column {
+  flex: 0 0 340px;            /* 關鍵 3：固定寬度，不縮 */
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  scroll-snap-align: start;   /* 關鍵 4：對齊滑動 */
+}
+
+/* Column title */
 .column h2 {
   margin: 0 0 12px 0;
   font-size: 16px;
 }
 
-/* Stock row – 五欄 */
+/* Stock row */
 .stock {
   display: grid;
   grid-template-columns:
-    1.6fr   /* 名稱 */
-    0.8fr   /* 代碼 */
-    1fr     /* 價格 */
-    1fr     /* 升跌 */
-    0.8fr;  /* 評級 */
+    1.6fr
+    0.8fr
+    1fr
+    1fr
+    0.8fr;
   gap: 8px;
   padding: 10px 0;
   border-bottom: 1px solid #eee;
@@ -97,13 +102,10 @@ nav a.active {
 }
 
 .stock .price,
-.stock .change {
-  text-align: right;
-}
-
+.stock .change,
 .stock .rating {
-  font-weight: 600;
   text-align: right;
+  font-weight: 600;
 }
 
 /* Rating colors */

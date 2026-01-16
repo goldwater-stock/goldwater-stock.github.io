@@ -49,23 +49,30 @@ nav a.active {
   padding: 16px;
 }
 
-/* ===== Threads-style horizontal columns ===== */
-
+/* Threads-style columns */
 .columns {
-  display: flex;              /* 關鍵 1：flex */
+  display: flex;
   gap: 16px;
-  overflow-x: auto;           /* 關鍵 2：橫向 scroll */
+  overflow-x: auto;
   scroll-snap-type: x mandatory;
   padding-bottom: 8px;
 }
 
-/* 每一個 column */
 .column {
-  flex: 0 0 340px;            /* 關鍵 3：固定寬度，不縮 */
+  flex: 0 0 340px;
   background: #fff;
   border-radius: 14px;
   padding: 16px;
-  scroll-snap-align: start;   /* 關鍵 4：對齊滑動 */
+  scroll-snap-align: start;
+  cursor: grab;
+}
+
+.column:active {
+  cursor: grabbing;
+}
+
+.column.dragging {
+  opacity: 0.6;
 }
 
 /* Column title */

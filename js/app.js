@@ -123,8 +123,7 @@ function getAfterColumn(container, x) {
       return closest;
     },
     { offset: Number.NEGATIVE_INFINITY }
-).element;
-
-
+  ).element;
+}
 
 

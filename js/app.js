@@ -239,19 +239,6 @@ function getValue(stock, key) {
   if (!el) return '';
 
   let t = el.textContent.trim();
- if (key === 'price') {
-  return parseFloat(
-    t.replace('$', '')
-     .replace(',', '')
-     .trim()
-  ) || 0;
+if (key === 'price' || key === 'change') {
+  return parseFloat(t.replace('%', '').replace('+', '')) || 0;
 }
-
-if (key === 'change') {
-  return parseFloat(
-    t.replace('%', '')
-     .replace('+', '')
-     .trim()
-  ) || 0;
-}
-

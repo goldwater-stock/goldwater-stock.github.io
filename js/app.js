@@ -240,11 +240,17 @@ function getValue(stock, key) {
 
   let t = el.textContent.trim();
 
+  // 價格 / 升幅：數字排序
   if (key === 'price' || key === 'change') {
     return parseFloat(
-      t.replace('%', '').replace('+', '').replace(',', '')
+      t
+        .replace('$', '')
+        .replace('%', '')
+        .replace('+', '')
+        .replace(',', '')
     ) || 0;
   }
 
+  // code：純文字排序
   return t;
 }

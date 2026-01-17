@@ -68,11 +68,11 @@ nav a.active {
 /* ===== Stock Header ===== */
 .stock-header {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1.2fr 1fr 1fr 0.6fr;
   gap: 12px;
   font-size: 0.85rem;
   font-weight: 600;
-  padding-bottom: 6px;
+  padding-bottom: 8px;
   border-bottom: 1px solid #ddd;
   color: #666;
 }
@@ -93,8 +93,8 @@ nav a.active {
   grid-template-areas:
     "name name name name"
     "code price change rating";
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 8px 12px;
+  grid-template-columns: 1.2fr 1.2fr 1.2fr 1.2fr;
+  gap: 3px 12px;
   padding: 10px 0;
   border-bottom: 1px solid #eee;
   font-size: 14px;

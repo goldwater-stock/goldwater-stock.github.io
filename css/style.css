@@ -73,12 +73,13 @@ nav a.active {
   font-weight: 600;
   padding-bottom: 6px;
   border-bottom: 1px solid #ddd;
+  color: #666;
 }
 
 .stock-header div {
   cursor: pointer;
   user-select: none;
-  text-align: center;
+  text-align: left;
 }
 
 .stock-header .hc-name {

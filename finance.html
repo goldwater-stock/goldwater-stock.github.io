@@ -1,48 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-HK">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>金融</title>
-  <link rel="stylesheet" href="css/style.css" />
-</head>
+  <meta charset="utf-8">
 
+  <!-- 關鍵：手機 100% 寬一定要有 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>金融股評分</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
 <body>
+
 <header>
-  <h1>金水股票評分</h1>
+  <h1>股票評分</h1>
   <nav>
-    <a class="active" href="index.html">主頁</a>
-    <a href="finance.html">金融</a>
+    <a href="index.html">主頁</a>
+    <a class="active" href="finance.html">金融</a>
     <a href="property.html">地產</a>
     <a href="tech.html">科技</a>
     <a href="consumer.html">消費</a>
-    <a href="tech.html">汽車</a>
-    <a href="consumer.html">能源</a>
-    <a href="tech.html">醫藥</a>
-    <a href="consumer.html">工業</a>
+    <a href="auto.html">汽車</a>
+    <a href="energy.html">能源</a>
+    <a href="healthcare.html">醫藥</a>
+    <a href="industry.html">工業</a>
   </nav>
 </header>
 
 <main class="main">
+
+  <!-- ✅ 結構必須和 index.html 一樣 -->
   <div class="columns">
 
-    <section class="column" data-col="finance">
+    <div class="column" data-col="col-finance">
       <h2>金融</h2>
-
-      <!-- 🔴 stock-header：4 欄，第一欄合併 -->
-      <div class="stock-header">
-        <div class="hc-name" data-key="code">股票/公司</div>
-        <div data-key="price">現價(港幣)</div>
-        <div data-key="change">今日升幅</div>
-        <div data-key="rating">評分</div>
-      </div>
-
-      <div id="col-finance"></div>
-    </section>
+        <div class="stock-header">
+          <div data-key="code">股票代碼</div>
+          <div data-key="name">公司名</div>
+          <div data-key="price">現價(港幣)</div>
+          <div data-key="change">今日升幅</div>
+          <div data-key="rating">評分</div>
+        </div>
+      <div id="stocks"></div>
+    </div>
 
   </div>
+
 </main>
 
 <script src="js/app.js"></script>
+
 </body>
 </html>

@@ -40,30 +40,44 @@ function enableSorting() {
     const key = header.dataset.key;
     if (!key) return;
 
-    let asc = true;
-
     header.addEventListener('click', () => {
-      const list = header.closest('.column').querySelector('[id^="col-"]');
+      const column = header.closest('.column');
+      const list = column.querySelector('[id^="col-"]');
+      if (!list) return;
+
+      // 讀取目前排序狀態
+      const currentDir = header.dataset.dir === 'asc' ? 'asc' : 'desc';
+      const nextDir = currentDir === 'asc' ? 'desc' : 'asc';
+
+      // 重置同一個 header row 的其他 icon
+      column.querySelectorAll('.stock-header div').forEach(h => {
+        h.dataset.dir = '';
+        h.textContent = h.textContent.replace(/[▲▼]/g, '').trim();
+      });
+
       const items = [...list.querySelectorAll('.stock')];
 
       items.sort((a, b) => {
         const va = getValue(a, key);
         const vb = getValue(b, key);
 
-        if (typeof va === 'number') {
-          return asc ? va - vb : vb - va;
+        if (typeof va === 'number' && typeof vb === 'number') {
+          return nextDir === 'asc' ? va - vb : vb - va;
         }
-        return asc
-          ? va.localeCompare(vb)
-          : vb.localeCompare(va);
+        return nextDir === 'asc'
+          ? String(va).localeCompare(String(vb))
+          : String(vb).localeCompare(String(va));
       });
 
-      asc = !asc;
+      // 更新 icon 與狀態
+      header.dataset.dir = nextDir;
+      header.textContent += nextDir === 'asc' ? ' ▲' : ' ▼';
+
       items.forEach(i => list.appendChild(i));
-      updateHeaderIcon(header, asc);
     });
   });
 }
+
 
 function updateHeaderIcon(header, asc) {
   document.querySelectorAll('.stock-header div').forEach(h => {
@@ -78,8 +92,12 @@ function getValue(stock, key) {
   if (!el) return '';
 
   let t = el.textContent.trim();
+
   if (key === 'price' || key === 'change') {
-    return parseFloat(t.replace('%', '').replace('+', '')) || 0;
+    return parseFloat(
+      t.replace(/[%$,]/g, '').replace('+', '')
+    ) || 0;
   }
+
   return t;
 }

@@ -1,50 +1,56 @@
-/* ===== Reset / Base ===== */
-
 * {
   box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 body {
   margin: 0;
   background: #f5f5f7;
   color: #111;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-               Roboto, Helvetica, Arial, sans-serif;
-  overflow-y: scroll; /* 防止 scrollbar 導致比例跳動 */
+  overflow-y: scroll;
 }
 
 /* ===== Header ===== */
-
 header {
   background: #fff;
-  border-bottom: 1px solid #ddd;
-  padding: 12px 16px;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 12px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 header h1 {
-  margin: 0 0 8px 0;
-  font-size: 1.2rem;
+  margin: 0;
+  font-size: 18px;
+}
+
+/* ===== Nav ===== */
+nav {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  margin-top: 8px;
 }
 
 nav a {
-  margin-right: 12px;
   text-decoration: none;
-  color: #333;
-  font-size: 0.9rem;
+  color: #555;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 nav a.active {
+  color: #000;
   font-weight: 600;
 }
 
-/* ===== Main Layout ===== */
-
+/* ===== Main ===== */
 .main {
   padding: 16px;
 }
 
-/* ===== Columns Container ===== */
-
+/* ===== Columns (Threads-style) ===== */
 .columns {
   display: flex;
   gap: 16px;
@@ -52,146 +58,100 @@ nav a.active {
   scroll-snap-type: x mandatory;
 }
 
-/* ===== Column ===== */
-
 .column {
-  flex: 0 0 500px;        /* 桌面固定寬 */
-  max-width: 500px;
+  flex: 0 0 460px;          /* ⭐ 比 500px 窄一點 */
+  max-width: 460px;
   background: #fff;
-  border-radius: 8px;
-  padding: 12px;
+  border-radius: 14px;
+  padding: 16px;
   scroll-snap-align: start;
-  cursor: default;       /* ⭐ column 本身不可拖 */
 }
 
-/* ===== Column Title (Drag Handle Only) ===== */
-
+/* column title */
 .column h2 {
-  margin: 0 0 8px 0;
-  font-size: 1rem;
-  cursor: grab;          /* ⭐ 只有標題可拖 */
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  cursor: grab;             /* 只有標題可拖 */
 }
 
-.column h2:active {
-  cursor: grabbing;
-}
-
-/* ===== Stock Header (Sortable) ===== */
-
+/* ===== Header row ===== */
 .stock-header {
   display: grid;
-  grid-template-columns: 0.8fr 1.2fr 1fr 1fr 0.8fr;
-  column-gap: 8px;
-  padding: 6px 0;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 12px;
   font-size: 0.85rem;
   font-weight: 600;
+  padding-bottom: 6px;
   border-bottom: 1px solid #ddd;
-  user-select: none;
-  cursor: default;
 }
 
 .stock-header div {
   cursor: pointer;
+  user-select: none;
+  text-align: center;
 }
 
-.stock-header div:hover {
-  text-decoration: underline;
+.stock-header div:first-child {
+  text-align: left;
 }
 
-/* 禁止 drag（關鍵） */
-.stock-header,
-.stock {
-  -webkit-user-drag: none;
-  user-drag: none;
-}
-
-/* ===== Stock Row ===== */
-
+/* ===== Stock row (統一桌機/手機結構) ===== */
 .stock {
   display: grid;
-  grid-template-columns: 0.8fr 1.2fr 1fr 1fr 0.8fr;
-  column-gap: 8px;
-  padding: 6px 0;
+  grid-template-areas:
+    "name name name name"
+    "code price change rating";
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 8px 12px;
+  padding: 10px 0;
   border-bottom: 1px solid #eee;
-  font-size: 0.9rem;
+  font-size: 14px;
 }
 
 .stock:last-child {
   border-bottom: none;
 }
 
-.stock .price,
-.stock .change,
+.stock .name {
+  grid-area: name;
+  font-weight: 600;
+}
+
+.stock .code {
+  grid-area: code;
+  color: #666;
+  text-align: left;
+}
+
+.stock .price {
+  grid-area: price;
+  text-align: center;
+}
+
+.stock .change {
+  grid-area: change;
+  text-align: center;
+}
+
 .stock .rating {
-  text-align: right;
+  grid-area: rating;
+  text-align: center;
 }
 
-/* ===== Rating Colors ===== */
-
-.rating.buy {
-  color: #0a7;
-  font-weight: 600;
-}
-
-.rating.sell {
-  color: #d33;
-  font-weight: 600;
-}
-
-.rating.hold {
-  color: #888;
-}
-
-/* ===== Dragging State ===== */
-
-.column.dragging {
-  opacity: 0.6;
-}
+/* ===== Rating colors ===== */
+.buy { color: #0a8a3a; }
+.hold { color: #666; }
+.sell { color: #d33; }
 
 /* ===== Mobile ===== */
-
 @media (max-width: 768px) {
-
-  /* 手機保留上下 padding，但 column 寬度扣掉左右 padding */
   .column {
     flex: 0 0 calc(100vw - 32px);
     max-width: calc(100vw - 32px);
-    font-size: 0.9rem; /* 整體字體稍小 */
+    font-size: 12px;
   }
-
 
   .stock {
-    display: grid;
-    grid-template-columns: 1fr auto auto auto;
-    grid-template-areas:
-      "name   name   name   name"
-      "code   price  change rating";
-    row-gap: 4px;
-  }
-
-  .stock .name {
-    grid-area: name;
-    font-weight: 500;
-  }
-
-  .stock .code {
-    grid-area: code;
-    font-size: 0.85em;
-    color: #666;
-  }
-
-  .stock .price {
-    grid-area: price;
-    text-align: right;
-  }
-
-  .stock .change {
-    grid-area: change;
-    text-align: right;
-  }
-
-  .stock .rating {
-    grid-area: rating;
-    text-align: right;
+    font-size: 13px;
   }
 }
